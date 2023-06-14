@@ -8,7 +8,6 @@ void main() {
   cpfAux = geraDigito(cpfAux);
   cpfAux = geraDigito(cpfAux);
   igor.cpf = ajustaMascaraCpf(cpf: cpfAux);
-
   if (verificaCpf(cpf: igor.cpf)) {
     print('CPF: ${igor.cpf}');
   } else {
