@@ -2,65 +2,67 @@ import 'dart:io';
 
 void main() {
   print('Digite os 9 primeiros números do cpf');
-  String cpfAux = stdin.readLineSync() ?? '';
-  PersonCPF igor = PersonCPF(cpf: cpfAux);
-  cpfAux = retornaNumerosCPF(cpf: cpfAux);
-  cpfAux = geraDigito(cpfAux);
-  cpfAux = geraDigito(cpfAux);
-  igor.cpf = ajustaMascaraCpf(cpf: cpfAux);
-  if (verificaCpf(cpf: igor.cpf)) {
-    print('CPF: ${igor.cpf}');
-  } else {
-    print('O número informado não é um CPF: ${igor.cpf}');
+  String userCPF = stdin.readLineSync() ?? '';
+  if (VerificaCPF().confirmaCPFInicial(cpf: userCPF)) {
+    userCPF = VerificaCPF().retornaNumerosCPF(cpf: userCPF);
+    userCPF = VerificaCPF().geraDigito(cpf: userCPF);
+    VerificaCPF().ajustaMascaraCpf(cpf: userCPF);
   }
 }
 
-class PersonCPF {
-  String cpf = '';
+class VerificaCPF {
+  String retornaNumerosCPF({required String cpf}) {
+    RegExp regex = RegExp(r'\d+');
+    Iterable<Match> matches = regex.allMatches(cpf);
 
-  PersonCPF({required this.cpf});
-}
+    List<String> numeros = [];
+    for (Match match in matches) {
+      numeros.add(match.group(0)!);
+    }
 
-String retornaNumerosCPF({required String cpf}) {
-  String aux = '';
-
-  RegExp regex = RegExp(r'\d+');
-  Iterable<Match> matches = regex.allMatches(cpf);
-
-  List<String> numeros = [];
-  for (Match match in matches) {
-    numeros.add(match.group(0)!);
+    return numeros.join();
   }
 
-  return numeros.join();
-}
+  String geraDigito({required String cpf}) {
+    var aux = 0;
+    var j = 2;
 
-String geraDigito(String cpf) {
-  var aux = 0;
-  var j = 2;
+    for (var i = cpf.length - 1; i >= 0; i--) {
+      aux = aux + (int.parse(cpf[i]) * j);
+      j++;
+    }
 
-  for (var i = cpf.length - 1; i >= 0; i--) {
-    aux = aux + (int.parse(cpf[i]) * j);
-    j++;
+    aux = aux % 11;
+
+    aux < 2 ? aux = 0 : aux = 11 - aux;
+
+    cpf = cpf + aux.toString();
+    if (cpf.length == 10) {
+      geraDigito(cpf: cpf);
+    }
+
+    return cpf;
   }
 
-  aux = aux % 11;
-
-  if (aux < 2) {
-    aux = 0;
-  } else {
-    aux = 11 - aux;
+  void ajustaMascaraCpf({required String cpf}) {
+    print(
+        'Seu CPF é: ${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9)}');
   }
-  return cpf + aux.toString();
-}
 
-String ajustaMascaraCpf({required String cpf}) {
-  return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9)}';
-}
-
-bool verificaCpf({required String cpf}) {
-  if (RegExp(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$').hasMatch(cpf)) {
-    return true;
+  bool confirmaCPFInicial({required String cpf}) {
+    if (RegExp(r'^\d{3}\.\d{3}\.\d{3}$').hasMatch(cpf) ||
+        RegExp(r'^\d{9}$').hasMatch(cpf)) {
+      return true;
+    }
+    print(
+        'O número informado é inválido para o formato dos 9 digitos iniciais do CPF!');
+    return false;
   }
-  return false;
+
+  bool confirmaCPF({required String cpf}) {
+    if (RegExp(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$').hasMatch(cpf)) {
+      return true;
+    }
+    return false;
+  }
 }
