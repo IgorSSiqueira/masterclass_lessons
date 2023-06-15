@@ -58,11 +58,4 @@ class VerificaCPF {
         'O número informado é inválido para o formato dos 9 digitos iniciais do CPF!');
     return false;
   }
-
-  bool confirmaCPF({required String cpf}) {
-    if (RegExp(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$').hasMatch(cpf)) {
-      return true;
-    }
-    return false;
-  }
 }
